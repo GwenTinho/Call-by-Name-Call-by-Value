@@ -15,3 +15,32 @@
   hal_id      = {hal-03409681},
   hal_version = {v3}
 }
+
+@article{10.1145/3371095,
+  author     = {Forster, Yannick and Kunze, Fabian and Roth, Marc},
+  title      = {The weak call-by-value λ-calculus is reasonable for both time and space},
+  year       = {2019},
+  issue_date = {January 2020},
+  publisher  = {Association for Computing Machinery},
+  address    = {New York, NY, USA},
+  volume     = {4},
+  number     = {POPL},
+  url        = {https://doi.org/10.1145/3371095},
+  doi        = {10.1145/3371095},
+  abstract   = {We study the weak call-by-value λ-calculus as a model for computational complexity theory and establish the natural measures for time and space — the number of beta-reduction steps and the size of the largest term in a computation — as reasonable measures with respect to the invariance thesis of Slot and van Emde Boas from 1984. More precisely, we show that, using those measures, Turing machines and the weak call-by-value λ-calculus can simulate each other within a polynomial overhead in time and a constant factor overhead in space for all computations terminating in (encodings of) ”true” or ”false”. The simulation yields that standard complexity classes like P, NP, PSPACE, or EXP can be defined solely in terms of the λ-calculus, but does not cover sublinear time or space. Note that our measures still have the well-known size explosion property, where the space measure of a computation can be exponentially bigger than its time measure. However, our result implies that this exponential gap disappears once complexity classes are considered instead of concrete computations. We consider this result a first step towards a solution for the long-standing open problem of whether the natural measures for time and space of the λ-calculus are reasonable. Our proof for the weak call-by-value λ-calculus is the first proof of reasonability (including both time and space) for a functional language based on natural measures and enables the formal verification of complexity-theoretic proofs concerning complexity classes, both on paper and in proof assistants. The proof idea relies on a hybrid of two simulation strategies of reductions in the weak call-by-value λ-calculus by Turing machines, both of which are insufficient if taken alone. The first strategy is the most naive one in the sense that a reduction sequence is simulated precisely as given by the reduction rules; in particular, all substitutions are executed immediately. This simulation runs within a constant overhead in space, but the overhead in time might be exponential. The second strategy is heap-based and relies on structure sharing, similar to existing compilers of eager functional languages. This strategy only has a polynomial overhead in time, but the space consumption might require an additional factor of logn, which is essentially due to the size of the pointers required for this strategy. Our main contribution is the construction and verification of a space-aware interleaving of the two strategies, which is shown to yield both a constant overhead in space and a polynomial overhead in time.},
+  journal    = {Proc. ACM Program. Lang.},
+  month      = {dec},
+  articleno  = {27},
+  numpages   = {23},
+  keywords   = {abstract machines, invariance thesis, lambda calculus, time and space complexity, weak call-by-value reduction}
+}
+
+@article{Church1936AnUP,
+  title   = {An Unsolvable Problem of Elementary Number Theory},
+  author  = {Alonzo Church},
+  journal = {American Journal of Mathematics},
+  year    = {1936},
+  volume  = {58},
+  pages   = {345},
+  url     = {https://api.semanticscholar.org/CorpusID:14181275}
+}
