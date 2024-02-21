@@ -1,0 +1,213 @@
+\documentclass[10pt]{beamer}
+
+\usetheme[progressbar=frametitle]{metropolis}
+\usepackage{appendixnumberbeamer}
+
+\usepackage{booktabs}
+\usepackage[scale=2]{ccicons}
+
+\usepackage{pgfplots}
+\usepgfplotslibrary{dateplot}
+
+\usepackage{listings}
+
+\usepackage{tikz}
+
+\usepackage{xspace}
+\newcommand{\themename}{\textbf{\textsc{metropolis}}\xspace}
+
+%%% Relevant videos
+% https://www.youtube.com/watch?v=NX7D5eEh2n0
+%
+
+%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% UNCC Theme Adjustments %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\definecolor{CanvasBG}{HTML}{FAFAFA}
+
+% From the official style guide
+\definecolor{UnccGreen}{HTML}{00703C}
+\definecolor{UnccGold}{HTML}{B3A369}
+\definecolor{UnccLightGreen}{HTML}{C3D7A4}
+\definecolor{UnccYellow}{HTML}{F0CB00}
+\definecolor{UnccOrange}{HTML}{F3901D}
+\definecolor{UnccLightYellow}{HTML}{FFF6DC}
+\definecolor{UnccBlue}{HTML}{00728F}
+\definecolor{UnccPink}{HTML}{DE3A6E}
+\definecolor{White}{HTML}{FFFFFF}
+\definecolor{LightGray}{HTML}{DDDDDD}
+
+% Supporting Color Palette
+\definecolor{WarmGray}{HTML}{696158}
+\definecolor{StoneGray}{HTML}{717C7D}
+\definecolor{DarkGreen}{HTML}{2C5234}
+\definecolor{LightGreen}{HTML}{509E2F}
+\definecolor{BrightGold}{HTML}{F0CB00}
+
+% Screamers
+\definecolor{Royal}{HTML}{72246C}
+\definecolor{Ocean}{HTML}{006BA6}
+\definecolor{Flash}{HTML}{B52555}
+\definecolor{Citrus}{HTML}{FFB81C}
+\definecolor{Spring}{HTML}{CEDC00}
+
+% Serenity
+\definecolor{Garden}{HTML}{B7CE95}
+\definecolor{Sand}{HTML}{F0E991}
+\definecolor{Bloom}{HTML}{F1E6B2}
+\definecolor{Clay}{HTML}{B7B09C}
+\definecolor{Cloud}{HTML}{BAC5B9}
+
+% Set colors here
+\setbeamercolor{frametitle}{bg=UnccGreen}
+\setbeamercolor{progress bar}{bg=BrightGold, fg=UnccGreen}
+\setbeamercolor{alerted text}{fg=Flash}
+
+\setbeamercolor{block title}{bg=LightGreen, fg=White}
+\setbeamercolor{block title example}{bg=Ocean, fg=White}
+\setbeamercolor{block title alerted}{bg=Citrus, fg=White}
+\setbeamercolor{block body}{bg=CanvasBG}
+
+\metroset{titleformat=smallcaps, progressbar=foot}
+
+\makeatletter
+\setlength{\metropolis@progressinheadfoot@linewidth}{2pt}
+\setlength{\metropolis@titleseparator@linewidth}{2pt}
+\setlength{\metropolis@progressonsectionpage@linewidth}{2pt}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% UNCC Theme Adjustments %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+\lstset{
+  basicstyle=\scriptsize\ttfamily,
+  keywordstyle=\color{Ocean},
+  stringstyle=,
+  xleftmargin=1em,
+  showstringspaces=false,
+  commentstyle=\itshape\rmfamily,
+  columns=flexible,
+  keepspaces=true,
+  texcl=true
+}
+\lstset{escapeinside={<@}{@>}}
+
+% https://www.mathcha.io/editor
+
+\title{Call by Name - Call by Value and the Lambda Calculus}
+% \date{\today}
+\date{}
+\author{Quentin Schroeder}
+\institute{MPRI - Université Paris-Cité}
+% \titlegraphic{\hfill\includegraphics[height=1.5cm]{logo.pdf}}
+
+\begin{document}
+
+\maketitle
+
+% Outline
+% 1. Motivation - why do we care about evaluation strategies
+% 2. Preliminaries - introduce the lambda calculus and the two evaluation strategies
+% 3. Call by Name - explain the evaluation strategy and its properties
+% 4. Call by Name - give examples in the lambda calculus
+% 5. Detour: Call by Need - explain the evaluation strategy and its properties
+% 6. Detour: Call by Need - give examples in haskell
+% 7. Call by Value - explain the evaluation strategy and its properties
+% 8. Call by Value - give examples in Ocaml
+
+\section[Idea]{Motivation}
+
+
+\begin{frame}[fragile]{Lambda Calculus}
+  \begin{alertblock}{Idea}
+    The lambda calculus is a formal system in mathematical logic for expressing computation based on function abstraction and application using variable binding and substitution.\\
+  \end{alertblock}
+
+\end{frame}
+
+\begin{frame}[fragile]{Some History}
+  \begin{alertblock}{History}
+    By Alonzo Church in the 1930s % cite here TODO
+    It is the basis for functional programming languages.\\
+  \end{alertblock}
+
+\end{frame}
+
+
+% The problem
+
+\begin{frame}[fragile]{The problem}
+  \begin{alertblock}{Problem}
+    We want to understand how to evaluate expressions in the lambda calculus.\\
+    We will focus on two strategies: call by name and call by value.\\
+  \end{alertblock}
+
+  \pause
+
+  \begin{alertblock}{Example}
+
+  \end{alertblock}
+
+  \begin{alertblock}{Question}
+
+  \end{alertblock}
+\end{frame}
+
+
+
+% overview slide
+\begin{frame}[fragile]{Overview}
+  \begin{itemize}
+    \item Preliminaries
+    \item Call by Name
+    \item Call by Value
+  \end{itemize}
+\end{frame}
+
+
+
+
+\begin{frame}[fragile]{The big idea}
+
+  \begin{alertblock}{Idea}
+    lorem ipsum
+  \end{alertblock}
+
+  \pause
+
+  \begin{alertblock}{Remark}
+
+    lorem ipsum
+  \end{alertblock}
+
+\end{frame}
+
+
+
+\section{Conclusion}
+
+
+\begin{frame}[fragile]{Things Left Open}
+  \begin{itemize}[<+- | alert@+>]
+    \item What blah
+  \end{itemize}
+\end{frame}
+
+
+
+\begin{frame}[standout]
+  Thank you
+\end{frame}
+
+\begin{frame}[allowframebreaks]{References}
+  \bibliographystyle{plainnat}
+  \bibliography{sources}
+\end{frame}
+
+
+
+\end{document}
