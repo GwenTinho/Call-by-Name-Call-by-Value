@@ -121,20 +121,62 @@
 
 \section[Idea]{Motivation}
 
+% give two code examples
+% one is a place where call by name is better
+% one is a place where call by value is better
+% explain the difference between the two
 
-\begin{frame}[fragile]{Lambda Calculus}
-  \begin{alertblock}{Idea}
-    The lambda calculus is a formal system in mathematical logic for expressing computation based on function abstraction and application using variable binding and substitution.\\
+% then give code examples in ocaml vs haskell to compare call by need and call by value
+
+\begin{frame}[fragile]{Motivation}
+  \begin{alertblock}{Problem}
+    We want to understand how to evaluate expressions in the lambda calculus.\\
+    We will focus on two strategies: call by name and call by value.\\
   \end{alertblock}
 
-\end{frame}
+  \pause
 
-\begin{frame}[fragile]{Some History}
-  \begin{alertblock}{History}
-    By Alonzo Church in the 1930s % cite here TODO
-    It is the basis for functional programming languages.\\
+  \begin{alertblock}{Example}
+    % insert code example of call by value in python
+
+    \begin{lstlisting}[language=Python]
+      def f(x):
+        return x + x
+
+      print(f(2 + 3))
+    \end{lstlisting}
+
+
+
   \end{alertblock}
 
+  \begin{alertblock}{Example }
+    % insert code example of call by value in python
+
+    \begin{lstlisting}[language=Python]
+      def project(x, y):
+        return x
+
+      def loop():
+        return loop()
+
+      print(project(2, loop()))
+    \end{lstlisting}
+
+
+  \end{alertblock}
+
+  \begin{alertblock}{Example}
+    % insert code example of call by value in python
+
+    \begin{lstlisting}[language=Haskell]
+      project x y = x
+
+      loop x = loop x
+
+      main = print (project 2 (loop 3))
+    \end{lstlisting}
+  \end{alertblock}
 \end{frame}
 
 
