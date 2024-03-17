@@ -147,42 +147,22 @@
 \end{frame}
 
 
-\begin{frame}[fragile]{Call by value (Python)}
-  \begin{alertblock}{Normal example}
-  \begin{lstlisting}[language=Python]
-    def f(x):
-      return x + x
-
-    print(f(2 + 3))
-  \end{lstlisting}
-  \end{alertblock}
-
-  \pause
-
-  \begin{alertblock}{Evil example}
-  \begin{lstlisting}[language=Python]
-    def project(x, y):
-      return x
-
-    def loop():
-      return loop()
-
-    print(project(2, loop()))
-  \end{lstlisting}
-  \end{alertblock}
-\end{frame}
-
-
 \begin{frame}[fragile]{Call by value (Ocaml)}
   \begin{alertblock}{Examples}
   \begin{lstlisting}[language=Caml, literate={_}{\_}{1}]
     let rec dumb_works n = if (n = 0 && n = 1) then dumb n else 42
 
-    let force_eval_branch b l r = if b then l else r
-
-    let rec dumb_breaks n = force_eval_branch (n = 0 && n = 1) (dumb_breaks n) 42
-
     let () = print_int (dumb_works 0)
+
+  \end{lstlisting}
+  \pause
+  \begin{lstlisting}[language=Caml, literate={_}{\_}{1}]
+
+    let branch b l r = if b then l else r
+
+    let rec dumb_breaks n = branch (n = 0 && n = 1) (dumb_breaks n) 42
+
+
     let () = print_int (dumb_breaks 0)
 
   \end{lstlisting}
@@ -225,12 +205,12 @@
 
 \begin{frame}[fragile]{Call by Name (???)}
   \begin{alertblock}{Is there a call by name programming language?}
-    Yes \dots kind of \dots
+    Yes \dots kind of (e.g. Algol 60)
   \end{alertblock}
 
   \begin{alertblock}{Example}
     Consider the following:
-  \begin{lstlisting}[language=, literate={_}{\_}{1}]
+  \begin{lstlisting}[language=Caml, literate={_}{\_}{1}]
     let rec horrible n = if n = 0 then 1 else n * horrible (n - 1) * horrible (n - 1)
 
     let printalot m =
@@ -245,6 +225,96 @@
   \end{alertblock}
 \end{frame}
 
+\section[Preliminaries]{How formally interpret these?}
+
+\begin{frame}[fragile]{Preliminaries}
+  \begin{alertblock}{Lambda Calculus}
+    \begin{itemize}
+      \item model of computation
+      \item basis for functional programming languages
+    \end{itemize}
+  \end{alertblock}
+\end{frame}
+
+\begin{frame}[fragile]{Preliminaries}
+  \begin{alertblock}{Linear Logic}
+    \begin{itemize}
+      \item a resource sensitive logic
+      \item can be used to priority in evaluation of proof terms
+    \end{itemize}
+  \end{alertblock}
+
+  \pause
+
+  \begin{alertblock}{A massive leap of faith}
+    \begin{itemize}
+      \item build a linear lambda calculus \cite[]{Maraist1995Jan}
+      \item show that it can be used to model execution strategies
+    \end{itemize}
+  \end{alertblock}
+\end{frame}
+
+\begin{frame}
+  \begin{alertblock}{Why do we care?}
+    \begin{itemize}
+      \item learn about the underlying structure of evaluation strategies
+      \item learn how to improve our current programming languages (e.g. Rust)
+      \item learn about them as models for complexity theory \cite[]{10.1145/3371095}
+    \end{itemize}
+  \end{alertblock}
+\end{frame}
+
+
+\begin{frame}[fragile]{Interpretation of Call by Value}
+  \begin{alertblock}{Call by Value}
+    \begin{itemize}
+      \item evaluate the argument before the function
+      \item the argument is evaluated at most once
+    \end{itemize}
+  \end{alertblock}
+
+  \pause
+
+  \begin{alertblock}{Call by Value via "suspending computation"}
+    \begin{itemize}
+      \item suspend computation of all the innermost functions calls
+      \item evaluate from last to first
+    \end{itemize}
+  \end{alertblock}
+
+\end{frame}
+
+  \begin{frame}[fragile]{Interpretation of Call by Value}
+
+  \begin{alertblock}{Example}
+    \begin{lstlisting}[language=Caml, literate={_}{\_}{1}]
+      let f x y = x + y
+      let () = print_int (f (1 + 2) (3 + 4))
+
+    \end{lstlisting}
+
+    \pause
+
+    \begin{itemize} [<+- | alert@+>]
+      \item evaluate \texttt{f (1 + 2) (3 + 4)}
+      \item evaluate \texttt{1 + 2}
+      \item evaluate \texttt{3 + 4}
+      \item evaluate \texttt{f 3 7}
+      \item evaluate \texttt{3 + 7}
+      \item print \texttt{10}
+    \end{itemize}
+
+    \pause
+
+    For the suspend interpretation: we would view this as blocking evaluation of \texttt{f} until the arguments are evaluated.
+  \end{alertblock}
+\end{frame}
+
+
+
+
+
+
 
 
 
@@ -254,15 +324,28 @@
 
 \section{Conclusion}
 
+\begin{frame}[fragile]{Conclusion}
+  \begin{alertblock}{In short}
+    \begin{itemize}
+      \item Call by Name
+      \item Call by Value
+      \item Call by Need
+    \end{itemize}
+  \end{alertblock}
 
+  \begin{alertblock}{For the next time}
+    \begin{itemize}
+      \item Model Call by Name and Call by Need in this model
+      \item Show interpretations have nice properties (soundness, completeness, etc.)
+    \end{itemize}
+  \end{alertblock}
+\end{frame}
 
 \begin{frame}[standout]
   Thank you
 \end{frame}
 
 \begin{frame}[allowframebreaks]{References}
-  \cite[]{Maraist1995Jan}
-  \cite[]{Plotkin1975Dec}
   \bibliographystyle{plainnat}
   \bibliography{sources}
 \end{frame}
