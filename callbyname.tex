@@ -2,6 +2,8 @@
 
 \usetheme[progressbar=frametitle]{metropolis}
 \usepackage{appendixnumberbeamer}
+\usepackage[sfdefault]{FiraSans}
+\usepackage{FiraMono}
 
 \usepackage{booktabs}
 \usepackage[scale=2]{ccicons}
@@ -98,12 +100,15 @@
 
 % https://www.mathcha.io/editor
 
-\title{Call by Name - Call by Value and the Lambda Calculus}
+\title{Call-by-name, Call-by-value, Call-by-need, and the Linear Lambda Calculus}
+% subtitle:
+\subtitle{Short Talk}
+
 % \date{\today}
 \date{}
 \author{Quentin Schroeder}
 \institute{MPRI - Université Paris-Cité}
-% \titlegraphic{\hfill\includegraphics[height=1.5cm]{logo.pdf}}
+\titlegraphic{\hfill\includegraphics[height=1.5cm]{logo.pdf}}
 
 \begin{document}
 
@@ -131,113 +136,123 @@
 \begin{frame}[fragile]{Motivation}
   \begin{alertblock}{Problem}
     We want to understand how to evaluate expressions in the lambda calculus.\\
-    We will focus on two strategies: call by name and call by value.\\
+    % enumerate with alerts
+  \end{alertblock}
+
+  \begin{itemize} [<+- | alert@+>]
+    \item Call by Name
+    \item Call by Value
+    \item Call by Need
+  \end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]{Call by value (Python)}
+  \begin{alertblock}{Normal example}
+  \begin{lstlisting}[language=Python]
+    def f(x):
+      return x + x
+
+    print(f(2 + 3))
+  \end{lstlisting}
+  \end{alertblock}
+
+  \pause
+
+  \begin{alertblock}{Evil example}
+  \begin{lstlisting}[language=Python]
+    def project(x, y):
+      return x
+
+    def loop():
+      return loop()
+
+    print(project(2, loop()))
+  \end{lstlisting}
+  \end{alertblock}
+\end{frame}
+
+
+\begin{frame}[fragile]{Call by value (Ocaml)}
+  \begin{alertblock}{Examples}
+  \begin{lstlisting}[language=Caml, literate={_}{\_}{1}]
+    let rec dumb_works n = if (n = 0 && n = 1) then dumb n else 42
+
+    let force_eval_branch b l r = if b then l else r
+
+    let rec dumb_breaks n = force_eval_branch (n = 0 && n = 1) (dumb_breaks n) 42
+
+    let () = print_int (dumb_works 0)
+    let () = print_int (dumb_breaks 0)
+
+  \end{lstlisting}
+  \end{alertblock}
+\end{frame}
+
+
+\begin{frame}[fragile]{Call by need (Haskell)}
+  \begin{alertblock}{Example}
+  \begin{lstlisting}[language=Haskell]
+    dumb n = if (n == 0 && n == 1) then dumb n else 42
+
+    forceEvalBranch b l r = if b then l else r
+
+    dumb2 n = forceEvalBranch (n == 0 && n == 1) (dumb2 n) 42
+
+    main = do
+        print $ dumb 0
+        print $ dumb 1
+        print $ dumb2 0
+        print $ dumb2 1
+
+  \end{lstlisting}
   \end{alertblock}
 
   \pause
 
   \begin{alertblock}{Example}
-    % insert code example of call by value in python
+  \begin{lstlisting}[language=Haskell]
+    project x y = x
 
-    \begin{lstlisting}[language=Python]
-      def f(x):
-        return x + x
+    loop x = loop x
 
-      print(f(2 + 3))
-    \end{lstlisting}
-
-
-
+    main = print $ project 2 (loop 3)
+  \end{lstlisting}
   \end{alertblock}
 
-  \begin{alertblock}{Example }
-    % insert code example of call by value in python
 
-    \begin{lstlisting}[language=Python]
-      def project(x, y):
-        return x
+\end{frame}
 
-      def loop():
-        return loop()
-
-      print(project(2, loop()))
-    \end{lstlisting}
-
-
+\begin{frame}[fragile]{Call by Name (???)}
+  \begin{alertblock}{Is there a call by name programming language?}
+    Yes \dots kind of \dots
   \end{alertblock}
 
   \begin{alertblock}{Example}
-    % insert code example of call by value in python
+    Consider the following:
+  \begin{lstlisting}[language=, literate={_}{\_}{1}]
+    let rec horrible n = if n = 0 then 1 else n * horrible (n - 1) * horrible (n - 1)
 
-    \begin{lstlisting}[language=Haskell]
-      project x y = x
+    let printalot m =
+      let () = print_endline (string_of_int m) in
+      let () = print_endline (string_of_int m) in
+      let () = print_endline (string_of_int m) in
+      let () = print_endline (string_of_int m)
 
-      loop x = loop x
+    let () = printNTimes (horrible 40)
 
-      main = print (project 2 (loop 3))
-    \end{lstlisting}
+  \end{lstlisting}
   \end{alertblock}
 \end{frame}
 
-
-% The problem
-
-\begin{frame}[fragile]{The problem}
-  \begin{alertblock}{Problem}
-    We want to understand how to evaluate expressions in the lambda calculus.\\
-    We will focus on two strategies: call by name and call by value.\\
-  \end{alertblock}
-
-  \pause
-
-  \begin{alertblock}{Example}
-
-  \end{alertblock}
-
-  \begin{alertblock}{Question}
-
-  \end{alertblock}
-\end{frame}
 
 
 
 % overview slide
-\begin{frame}[fragile]{Overview}
-  \begin{itemize}
-    \item Preliminaries
-    \item Call by Name
-    \item Call by Value
-  \end{itemize}
-\end{frame}
-
-
-
-
-\begin{frame}[fragile]{The big idea}
-
-  \begin{alertblock}{Idea}
-    lorem ipsum
-  \end{alertblock}
-
-  \pause
-
-  \begin{alertblock}{Remark}
-
-    lorem ipsum
-  \end{alertblock}
-
-\end{frame}
 
 
 
 \section{Conclusion}
-
-
-\begin{frame}[fragile]{Things Left Open}
-  \begin{itemize}[<+- | alert@+>]
-    \item What blah
-  \end{itemize}
-\end{frame}
 
 
 
@@ -246,6 +261,8 @@
 \end{frame}
 
 \begin{frame}[allowframebreaks]{References}
+  \cite[]{Maraist1995Jan}
+  \cite[]{Plotkin1975Dec}
   \bibliographystyle{plainnat}
   \bibliography{sources}
 \end{frame}
