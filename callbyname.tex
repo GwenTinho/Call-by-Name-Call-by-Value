@@ -100,7 +100,7 @@
 
 % https://www.mathcha.io/editor
 
-\title{Call-by-name, Call-by-value, Call-by-need, and the Linear Lambda Calculus}
+\title{Call-by-name, Call-by-value, Call-by-need, and the Linear Lambda Calculus }
 % subtitle:
 \subtitle{Short Talk}
 
@@ -150,7 +150,7 @@
 \begin{frame}[fragile]{Call by value (Ocaml)}
   \begin{alertblock}{Examples}
   \begin{lstlisting}[language=Caml, literate={_}{\_}{1}]
-    let rec dumb_works n = if (n = 0 && n = 1) then dumb n else 42
+    let rec dumb_works n = if false then dumb_works n else 42
 
     let () = print_int (dumb_works 0)
 
@@ -160,7 +160,7 @@
 
     let branch b l r = if b then l else r
 
-    let rec dumb_breaks n = branch (n = 0 && n = 1) (dumb_breaks n) 42
+    let rec dumb_breaks n = branch false (dumb_breaks n) 42
 
 
     let () = print_int (dumb_breaks 0)
@@ -211,7 +211,7 @@
   \begin{alertblock}{Example}
     Consider the following:
   \begin{lstlisting}[language=Caml, literate={_}{\_}{1}]
-    let rec horrible n = if n = 0 then 1 else n * horrible (n - 1) * horrible (n - 1)
+    let rec h n = if n = 0 then 1 else n * h (n - 1) * h (n - 1)
 
     let printalot m =
       let () = print_endline (string_of_int m) in
@@ -219,7 +219,7 @@
       let () = print_endline (string_of_int m) in
       let () = print_endline (string_of_int m)
 
-    let () = printNTimes (horrible 40)
+    let () = printNTimes (h 40)
 
   \end{lstlisting}
   \end{alertblock}
@@ -296,17 +296,13 @@
     \pause
 
     \begin{itemize} [<+- | alert@+>]
-      \item evaluate \texttt{f (1 + 2) (3 + 4)}
-      \item evaluate \texttt{1 + 2}
+      \item suspend \texttt{f (1 + 2) (3 + 4)}
+      \item suspend \texttt{1 + 2}
+      \item suspend \texttt{3 + 4}
       \item evaluate \texttt{3 + 4}
+      \item evaluate \texttt{1 + 2}
       \item evaluate \texttt{f 3 7}
-      \item evaluate \texttt{3 + 7}
-      \item print \texttt{10}
     \end{itemize}
-
-    \pause
-
-    For the suspend interpretation: we would view this as blocking evaluation of \texttt{f} until the arguments are evaluated.
   \end{alertblock}
 \end{frame}
 
