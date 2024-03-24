@@ -4,12 +4,17 @@
 \usepackage{appendixnumberbeamer}
 \usepackage[sfdefault]{FiraSans}
 \usepackage{FiraMono}
+\usepackage{bussproofs}
 
+\usepackage[absolute,overlay]{textpos}
 \usepackage{booktabs}
 \usepackage[scale=2]{ccicons}
 
+
+
 \usepackage{pgfplots}
 \usepgfplotslibrary{dateplot}
+
 
 \usepackage{listings}
 
@@ -17,12 +22,26 @@
 
 \usepackage{xspace}
 \newcommand{\themename}{\textbf{\textsc{metropolis}}\xspace}
+\usepackage{cmll}
+\EnableBpAbbreviations
 
-%%% Relevant videos
-% https://www.youtube.com/watch?v=NX7D5eEh2n0
-%
+\newcommand{\lam}[2]{\lambda #1 . #2}
+\newcommand{\llet}[3]{\text{let }  ! #1 = #2 \text{ in } #3}
 
-%%%
+\newcommand{\app}[2]{#1 \; #2}
+\newcommand{\subst}[2]{[#1 := #2]}
+\newcommand{\substt}[4]{[#1 := #2, #3 := #4]}
+
+\newenvironment*{inference}[2]{
+  \begin{textblock*}{5cm}(#1,#2)
+    \begin{prooftree}
+
+    }
+    {
+    \end{prooftree}
+
+  \end{textblock*}
+}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -96,7 +115,6 @@
   keepspaces=true,
   texcl=true
 }
-\lstset{escapeinside={<@}{@>}}
 
 % https://www.mathcha.io/editor
 
@@ -114,127 +132,173 @@
 
 \maketitle
 
-% Outline
-% 1. Motivation - why do we care about evaluation strategies
-% 2. Preliminaries - introduce the lambda calculus and the two evaluation strategies
-% 3. Call by Name - explain the evaluation strategy and its properties
-% 4. Call by Name - give examples in the lambda calculus
-% 5. Detour: Call by Need - explain the evaluation strategy and its properties
-% 6. Detour: Call by Need - give examples in haskell
-% 7. Call by Value - explain the evaluation strategy and its properties
-% 8. Call by Value - give examples in Ocaml
+% plan
+% short motivation
+% introduce the lambda calculus and explain the evaluation strategies within it
+% introduce the linear lambda calculus
+% show how to interpret call by value
+% show how to interpret call by name
+% shortly talk about the affine lambda calculus
+% show how to interpret call by let
+% show how to interpret call by need
 
 \section[Idea]{Motivation}
 
-% give two code examples
-% one is a place where call by name is better
-% one is a place where call by value is better
-% explain the difference between the two
-
-% then give code examples in ocaml vs haskell to compare call by need and call by value
-
 \begin{frame}[fragile]{Motivation}
-  \begin{alertblock}{Problem}
-    We want to understand how to evaluate expressions in the lambda calculus.\\
-    % enumerate with alerts
+  \begin{alertblock}{Goal}
+    Study evaluation strategies via the linear lambda calculus
   \end{alertblock}
 
-  \begin{itemize} [<+- | alert@+>]
-    \item Call by Name
-    \item Call by Value
-    \item Call by Need
-  \end{itemize}
-\end{frame}
-
-
-\begin{frame}[fragile]{Call by value (Ocaml)}
-  \begin{alertblock}{Examples}
-  \begin{lstlisting}[language=Caml, literate={_}{\_}{1}]
-    let rec dumb_works n = if false then dumb_works n else 42
-
-    let () = print_int (dumb_works 0)
-
-  \end{lstlisting}
-  \pause
-  \begin{lstlisting}[language=Caml, literate={_}{\_}{1}]
-
-    let branch b l r = if b then l else r
-
-    let rec dumb_breaks n = branch false (dumb_breaks n) 42
-
-
-    let () = print_int (dumb_breaks 0)
-
-  \end{lstlisting}
-  \end{alertblock}
-\end{frame}
-
-
-\begin{frame}[fragile]{Call by need (Haskell)}
-  \begin{alertblock}{Example}
-  \begin{lstlisting}[language=Haskell]
-    dumb n = if (n == 0 && n == 1) then dumb n else 42
-
-    forceEvalBranch b l r = if b then l else r
-
-    dumb2 n = forceEvalBranch (n == 0 && n == 1) (dumb2 n) 42
-
-    main = do
-        print $ dumb 0
-        print $ dumb 1
-        print $ dumb2 0
-        print $ dumb2 1
-
-  \end{lstlisting}
-  \end{alertblock}
-
-  \pause
-
-  \begin{alertblock}{Example}
-  \begin{lstlisting}[language=Haskell]
-    project x y = x
-
-    loop x = loop x
-
-    main = print $ project 2 (loop 3)
-  \end{lstlisting}
-  \end{alertblock}
-
-
-\end{frame}
-
-\begin{frame}[fragile]{Call by Name (???)}
-  \begin{alertblock}{Is there a call by name programming language?}
-    Yes \dots kind of (e.g. Algol 60)
-  \end{alertblock}
-
-  \begin{alertblock}{Example}
-    Consider the following:
-  \begin{lstlisting}[language=Caml, literate={_}{\_}{1}]
-    let rec h n = if n = 0 then 1 else n * h (n - 1) * h (n - 1)
-
-    let printalot m =
-      let () = print_endline (string_of_int m) in
-      let () = print_endline (string_of_int m) in
-      let () = print_endline (string_of_int m) in
-      let () = print_endline (string_of_int m)
-
-    let () = printNTimes (h 40)
-
-  \end{lstlisting}
-  \end{alertblock}
-\end{frame}
-
-\section[Preliminaries]{How formally interpret these?}
-
-\begin{frame}[fragile]{Preliminaries}
-  \begin{alertblock}{Lambda Calculus}
+  \begin{alertblock}{Why?}
     \begin{itemize}
-      \item model of computation
-      \item basis for functional programming languages
+      \item found linearity is relevant when studying Call by Need
+      \item noticed it also applies for other strategies
     \end{itemize}
   \end{alertblock}
 \end{frame}
+
+\begin{frame}[fragile]{Overview}
+  \begin{enumerate}
+    \item Linear Lambda Calculus
+    \item Call by Name
+    \item Call by Value
+    \item Notes on Call by Need
+    \item Results
+    \item Conclusion
+  \end{enumerate}
+
+\end{frame}
+
+
+
+% give me the typing rules for the simply typed lambda calculus in BNF in one line
+
+
+
+
+\begin{frame}[fragile]{Simply Typed Lambda Calculus (Syntax)}
+  \begin{textblock*}{3cm}(0.3cm, 1cm)
+    \begin{align*}
+      \textbf{Types : } A, B , C ::= & \; \text{basic types} \;  | \; A \rightarrow B \\
+      \textbf{Terms : } L,M, N ::=   & \; V \; | \; \app{M}{N}                        \\
+      \textbf{Values : } V, W ::=    & \; x \; | \; \lam{x}{t}                        \\
+    \end{align*}
+  \end{textblock*}
+
+  \begin{inference}{0.1cm}{3cm}
+    \AXC{}
+    \LeftLabel{\scriptsize Id}
+    \UIC{$x : A \vdash x : A$}
+  \end{inference}
+
+  \begin{inference}{0.1cm}{4cm}
+    \AXC{$\Gamma, y : A, z : A \rightarrow M : B$}
+    \LeftLabel{\scriptsize Contraction}
+    \UIC{$\Gamma , x : A \vdash M \substt{y}{x}{z}{x} : B$}
+  \end{inference}
+
+  \begin{inference}{5.5cm}{4cm}
+    \AXC{$\Gamma \vdash M : B$}
+    \LeftLabel{\scriptsize Weakening}
+    \UIC{$\Gamma , x : A \vdash M  : B$}
+  \end{inference}
+
+  \begin{inference}{0.1cm}{5cm}
+    \AXC{$\Gamma, x:A \vdash M : B$}
+    \LeftLabel{\scriptsize $\rightarrow - Intro$}
+    \UIC{$\Gamma \vdash \lam{x}{M} : A \rightarrow B$}
+  \end{inference}
+
+  \begin{inference}{5.5cm}{5cm}
+    \AXC{$\Gamma \vdash M : A \rightarrow B$}
+    \AXC{$\Delta \vdash N : A$}
+    \LeftLabel{\scriptsize $\rightarrow - Elim$}
+    \BIC{$\Gamma, \Delta \vdash \app{M}{N} : B$}
+  \end{inference}
+
+\end{frame}
+
+\begin{frame}[fragile]{Simply Typed Lambda Calculus (Evaluation Strategies)}
+  \begin{alertblock}{Call by Name}
+    Reduces on terms, not values \\
+    $(\beta_{name}) : \app{(\lam{x}{M})}{N} \rightsquigarrow M \subst{x}{N}$ \\
+  \end{alertblock}
+
+  \begin{alertblock}{Call by Value}
+    Reduces on values, not terms \\
+    $(\beta_{value}) : \app{(\lam{x}{M})}{V} \rightsquigarrow M \subst{x}{V}$ \\
+
+  \end{alertblock}
+
+\end{frame}
+
+\begin{frame}
+  % examples of terms
+  \begin{exampleblock}{Example}
+    From \cite[SE:101670]{stackexchange:101670}
+    \begin{align*}
+      \app{\app{(\lam{p}{\lam{q}{p}})}{(\lam{a}{\lam{b}{a}})}}{(\lam{a}{\lam{b}{b}})}
+    \end{align*}
+  \end{exampleblock}
+
+\end{frame}
+
+
+
+\begin{frame}[fragile]{Linear Lambda Calculus (Syntax)}
+
+  \begin{textblock*}{3cm}(0.3cm, 1cm)
+    \begin{align*}
+      \textbf{Types : } A, B , C ::= & \; \text{basic types} \; | \; ! A \; | \; A \multimap A                         \\
+      \textbf{Terms : } L,M, N ::=   & \; x \; | \; ! M  \; | \; \llet{x}{M}{N}  \; | \; \lam{x}{M} \; | \; \app{M}{N} \\
+    \end{align*}
+  \end{textblock*}
+
+  \begin{inference}{0.1cm}{3cm}
+    \AXC{}
+    \LeftLabel{\scriptsize Id}
+    \UIC{$x : A \vdash x : A$}
+  \end{inference}
+
+  \begin{inference}{4cm}{3cm}
+    \AXC{$\Gamma, x: A \vdash M : B$}
+    \LeftLabel{\scriptsize Dereliction}
+    \UIC{$\Gamma, ! x : ! A \vdash M : B$}
+  \end{inference}
+
+  \begin{inference}{4cm}{4cm}
+    \AXC{$\Gamma, ! y : ! A, ! z : ! A \multimap M : B$}
+    \LeftLabel{\scriptsize Contraction}
+    \UIC{$\Gamma , ! x : ! A \vdash M \substt{y}{x}{z}{x} : B$}
+  \end{inference}
+
+  \begin{inference}{4cm}{4cm}
+    \AXC{$\Gamma \vdash M : B$}
+    \LeftLabel{\scriptsize Weakening}
+    \UIC{$\Gamma , x : A \vdash M  : B$}
+  \end{inference}
+
+  \begin{inference}{0.1cm}{4cm}
+    \AXC{$! \Gamma \vdash M : A$}
+    \LeftLabel{\scriptsize !-Intro}
+    \UIC{$! \Gamma \vdash ! M : ! A$}
+  \end{inference}
+
+  \begin{inference}{0.1cm}{5cm}
+    \AXC{$! \Gamma \vdash M : ! A$}
+    \AXC{$\Delta, ! x : ! A \vdash N : B$}
+    \LeftLabel{\scriptsize !-Elim}
+    \BIC{$\Gamma, \Delta \vdash \llet{x}{M}{N} : B$}
+  \end{inference}
+
+\end{frame}
+
+
+
+
+
+
+
 
 \begin{frame}[fragile]{Preliminaries}
   \begin{alertblock}{Linear Logic}
@@ -254,95 +318,14 @@
   \end{alertblock}
 \end{frame}
 
-\begin{frame}
-  \begin{alertblock}{Why do we care?}
-    \begin{itemize}
-      \item learn about the underlying structure of evaluation strategies
-      \item learn how to improve our current programming languages (e.g. Rust)
-      \item learn about them as models for complexity theory \cite[]{10.1145/3371095}
-    \end{itemize}
-  \end{alertblock}
-\end{frame}
-
-
-\begin{frame}[fragile]{Interpretation of Call by Value}
-  \begin{alertblock}{Call by Value}
-    \begin{itemize}
-      \item evaluate the argument before the function
-      \item the argument is evaluated at most once
-    \end{itemize}
-  \end{alertblock}
-
-  \pause
-
-  \begin{alertblock}{Call by Value via "suspending computation"}
-    \begin{itemize}
-      \item suspend computation of all the innermost functions calls
-      \item evaluate from last to first
-    \end{itemize}
-  \end{alertblock}
-
-\end{frame}
-
-  \begin{frame}[fragile]{Interpretation of Call by Value}
-
-  \begin{alertblock}{Example}
-    \begin{lstlisting}[language=Caml, literate={_}{\_}{1}]
-      let f x y = x + y
-      let () = print_int (f (1 + 2) (3 + 4))
-
-    \end{lstlisting}
-
-    \pause
-
-    \begin{itemize} [<+- | alert@+>]
-      \item suspend \texttt{f (1 + 2) (3 + 4)}
-      \item suspend \texttt{1 + 2}
-      \item suspend \texttt{3 + 4}
-      \item evaluate \texttt{3 + 4}
-      \item evaluate \texttt{1 + 2}
-      \item evaluate \texttt{f 3 7}
-    \end{itemize}
-  \end{alertblock}
-\end{frame}
 
 
 
 
 
-
-
-
-
-% overview slide
-
-
-
-\section{Conclusion}
-
-\begin{frame}[fragile]{Conclusion}
-  \begin{alertblock}{In short}
-    \begin{itemize}
-      \item Call by Name
-      \item Call by Value
-      \item Call by Need
-    \end{itemize}
-  \end{alertblock}
-
-  \begin{alertblock}{For the next time}
-    \begin{itemize}
-      \item Model Call by Name and Call by Need in this model
-      \item Show interpretations have nice properties (soundness, completeness, etc.)
-    \end{itemize}
-  \end{alertblock}
-\end{frame}
-
-\begin{frame}[standout]
-  Thank you
-\end{frame}
 
 \begin{frame}[allowframebreaks]{References}
-  \bibliographystyle{plainnat}
+  \bibliographystyle{amsalpha}
   \bibliography{sources}
 \end{frame}
 
