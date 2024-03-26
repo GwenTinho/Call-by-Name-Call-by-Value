@@ -5,6 +5,7 @@
 \usepackage[sfdefault]{FiraSans}
 \usepackage{FiraMono}
 \usepackage{bussproofs}
+% https://www.logicmatters.net/resources/pdfs/latex/BussGuide2.pdf
 
 \usepackage[absolute,overlay]{textpos}
 \usepackage{booktabs}
@@ -19,7 +20,6 @@
 \usepackage{listings}
 
 \usepackage{tikz}
-
 \usepackage{xspace}
 \newcommand{\themename}{\textbf{\textsc{metropolis}}\xspace}
 \usepackage{cmll}
@@ -27,10 +27,13 @@
 
 \newcommand{\lam}[2]{\lambda #1 . #2}
 \newcommand{\llet}[3]{\text{let }  ! #1 = #2 \text{ in } #3}
+\newcommand{\plet}[3]{\text{let }   #1 = #2 \text{ in } #3}
 
 \newcommand{\app}[2]{#1 \; #2}
 \newcommand{\subst}[2]{[#1 := #2]}
 \newcommand{\substt}[4]{[#1 := #2, #3 := #4]}
+
+\newcommand{\minus}{\scalebox{0.75}[1.0]{$-$}}
 
 \newenvironment*{inference}[2]{
   \begin{textblock*}{5cm}(#1,#2)
@@ -120,7 +123,7 @@
 
 \title{Call-by-name, Call-by-value, Call-by-need, and the Linear Lambda Calculus }
 % subtitle:
-\subtitle{Short Talk}
+\subtitle{Initiation à la recherche}
 
 % \date{\today}
 \date{}
@@ -155,14 +158,19 @@
       \item noticed it also applies for other strategies
     \end{itemize}
   \end{alertblock}
+
+  \cite{Maraist1995Jan}
 \end{frame}
 
 \begin{frame}[fragile]{Overview}
   \begin{enumerate}
+    \item Simply Typed Lambda Calculus
+    \item Call by Name, Call by Value (Evaluation Strategies)
     \item Linear Lambda Calculus
-    \item Call by Name
-    \item Call by Value
-    \item Notes on Call by Need
+    \item Interpretations of Call by Name, Call by Value
+    \item Call by Let, Call by Need
+    \item Affine Lambda Calculus
+    \item Interpretations of Call by Let, Call by Need
     \item Results
     \item Conclusion
   \end{enumerate}
@@ -191,25 +199,25 @@
     \UIC{$x : A \vdash x : A$}
   \end{inference}
 
-  \begin{inference}{0.1cm}{4cm}
-    \AXC{$\Gamma, y : A, z : A \rightarrow M : B$}
+  \begin{inference}{0.8cm}{4.5cm}
+    \AXC{$\Gamma, y : A, z : A \vdash M : B$}
     \LeftLabel{\scriptsize Contraction}
     \UIC{$\Gamma , x : A \vdash M \substt{y}{x}{z}{x} : B$}
   \end{inference}
 
-  \begin{inference}{5.5cm}{4cm}
+  \begin{inference}{6.7cm}{4.5cm}
     \AXC{$\Gamma \vdash M : B$}
     \LeftLabel{\scriptsize Weakening}
     \UIC{$\Gamma , x : A \vdash M  : B$}
   \end{inference}
 
-  \begin{inference}{0.1cm}{5cm}
+  \begin{inference}{0.5cm}{6cm}
     \AXC{$\Gamma, x:A \vdash M : B$}
     \LeftLabel{\scriptsize $\rightarrow - Intro$}
     \UIC{$\Gamma \vdash \lam{x}{M} : A \rightarrow B$}
   \end{inference}
 
-  \begin{inference}{5.5cm}{5cm}
+  \begin{inference}{5.8cm}{6cm}
     \AXC{$\Gamma \vdash M : A \rightarrow B$}
     \AXC{$\Delta \vdash N : A$}
     \LeftLabel{\scriptsize $\rightarrow - Elim$}
@@ -222,30 +230,312 @@
   \begin{alertblock}{Call by Name}
     Reduces on terms, not values \\
     $(\beta_{name}) : \app{(\lam{x}{M})}{N} \rightsquigarrow M \subst{x}{N}$ \\
+    Strategy : Left-most, outermost redex first but no reduction under lambda. \\
+    (Redex = reducible expression, i.e. $\app{(\lam{x}{M})}{y}$)
   \end{alertblock}
+
+  \pause
 
   \begin{alertblock}{Call by Value}
     Reduces on values, not terms \\
     $(\beta_{value}) : \app{(\lam{x}{M})}{V} \rightsquigarrow M \subst{x}{V}$ \\
+    Strategy : Right-most, innermost redex first but no reduction under lambda. \\
 
   \end{alertblock}
+
+  \pause
+
+  \begin{alertblock}{Note}
+    We will shorten "lambda calculus" as LC.\\
+  \end{alertblock}
+
+\end{frame}
+
+\newcommand*{\myt}{\lam{a}{\lam{b}{a}}} % a -> b -> a
+\newcommand*{\myf}{\lam{c}{\lam{d}{d}}} % c -> d -> d
+\begin{frame}
+  % examples of terms
+  \begin{exampleblock}{Example Call by Name}
+    From \cite{SE101672}
+    \begin{align*}
+      \app{(\lam{p}{\lam{q}{\app{\app{p}{q}}{p}}})}{(\app{(\myt)}{(\myf)})}
+    \end{align*}
+
+    % give me the evaluation of this term under call by name
+    % give me the evaluation of this term under call by value
+
+
+
+    \begin{align*}
+       & \app{(\lam{p}{\lam{q}{\app{\app{p}{q}}{p}}})}{(\app{(\myt)}{(\myf)})} \\
+       & \quad \rightsquigarrow \lam{q}{
+        \app{
+          \app{(\app{(\myt)}{(\myf)})}{q}
+      }{(\app{(\myt)}{(\myf)})}}                                               \\
+       & \quad \rightsquigarrow \lam{q}{
+        \app{
+          \app{(
+            \lam{b}{\myf}
+            )}{q}
+      }{(\app{(\myt)}{(\myf)})}}                                               \\
+       & \quad \rightsquigarrow \lam{q}{
+        \app{
+          (\myf)
+      }{(\app{(\myt)}{(\myf)})}}                                               \\
+       & \quad \rightsquigarrow \lam{q}{\lam{d}{d}}
+    \end{align*}
+
+
+  \end{exampleblock}
 
 \end{frame}
 
 \begin{frame}
   % examples of terms
-  \begin{exampleblock}{Example}
-    From \cite[SE:101670]{stackexchange:101670}
+  \begin{exampleblock}{Example Call by Value}
+    From \cite{SE101672}
     \begin{align*}
-      \app{\app{(\lam{p}{\lam{q}{p}})}{(\lam{a}{\lam{b}{a}})}}{(\lam{a}{\lam{b}{b}})}
+      \app{(\lam{p}{\lam{q}{\app{\app{p}{q}}{p}}})}{(\app{(\myt)}{(\myf)})}
     \end{align*}
+
+    % give me the evaluation of this term under call by name
+    % give me the evaluation of this term under call by value
+
+
+
+    \begin{align*}
+       & \app{(\lam{p}{\lam{q}{\app{\app{p}{q}}{p}}})}{(\app{(\myt)}{(\myf)})}  \\
+       & \quad \rightsquigarrow \app{(\lam{p}{\lam{q}{\app{\app{p}{q}}{p}}})}{(
+        \lam{b}{\myf}
+      )}                                                                        \\
+       & \quad \rightsquigarrow \lam{q}{
+        \app{
+          \app{(
+            \lam{b}{\myf}
+            )}{q}
+      }{(\lam{b}{\myf})}}                                                       \\
+       & \quad \rightsquigarrow \lam{q}{
+        \app{
+          (\myf)
+      }{(\lam{b}{\myf})}}                                                       \\
+       & \quad \rightsquigarrow \lam{q}{\lam{d}{d}}
+    \end{align*}
+
+
   \end{exampleblock}
 
 \end{frame}
 
 
 
-\begin{frame}[fragile]{Linear Lambda Calculus (Syntax)}
+\begin{frame}[fragile]{Linear Lambda Calculus (Terms, Types)}
+
+  \begin{textblock*}{3cm}(0.3cm, 1cm)
+    \begin{align*}
+      \textbf{Types : } A, B , C ::= & \; \text{basic types} \; | \; ! A \; | \; A \multimap B                         \\
+      \textbf{Terms : } L,M, N ::=   & \; x \; | \; ! M  \; | \; \llet{x}{M}{N}  \; | \; \lam{x}{M} \; | \; \app{M}{N} \\
+    \end{align*}
+  \end{textblock*}
+
+  \begin{inference}{0.1cm}{3cm}
+    \AXC{}
+    \LeftLabel{\scriptsize Id}
+    \UIC{$x : A \vdash x : A$}
+  \end{inference}
+
+  \begin{inference}{4.2cm}{2.9cm}
+    \AXC{$\Gamma, x: A \vdash M : B$}
+    \LeftLabel{\scriptsize Dereliction}
+    \UIC{$\Gamma, ! x : ! A \vdash M : B$}
+  \end{inference}
+
+  \begin{inference}{0.8cm}{4.5cm}
+    \AXC{$\Gamma, ! y : ! A, ! z : ! A \multimap M : B$}
+    \LeftLabel{\scriptsize Contraction}
+    \UIC{$\Gamma , ! x : ! A \vdash M \substt{y}{x}{z}{x} : B$}
+  \end{inference}
+
+  \begin{inference}{6.7cm}{4.5cm}
+    \AXC{$\Gamma \vdash M : B$}
+    \LeftLabel{\scriptsize Weakening}
+    \UIC{$\Gamma , ! x : ! A \vdash M  : B$}
+  \end{inference}
+
+  \begin{inference}{0.1cm}{6cm}
+    \AXC{$! \Gamma \vdash M : A$}
+    \LeftLabel{\scriptsize !-Intro}
+    \UIC{$! \Gamma \vdash ! M : ! A$}
+  \end{inference}
+
+  \begin{inference}{4.3cm}{6cm}
+    \AXC{$! \Gamma \vdash M : ! A$}
+    \AXC{$\Delta, ! x : ! A \vdash N : B$}
+    \LeftLabel{\scriptsize !-Elim}
+    \BIC{$\Gamma, \Delta \vdash \llet{x}{M}{N} : B$}
+  \end{inference}
+
+\end{frame}
+
+\begin{frame}[fragile]{Linear Lambda Calculus (Reduction Rules)}
+  % itemize without bullets
+  \begin{itemize}
+    \item ($\beta_{\multimap}$) : $\app{(\lam{x}{M})}{N} \rightsquigarrow M \subst{x}{N}$
+    \item ($\beta_{!}$) : $\llet{x}{! M}{! N} \rightsquigarrow N \subst{x}{M}$
+    \item ($! \multimap$) : $\app{\llet{x}{L}{M}}{N}  \rightsquigarrow \llet{x}{L}{\app{M}{N}}$
+    \item ($! !$): $\llet{y}{(\llet{x}{L}{M})}{N} \rightsquigarrow \llet{x}{L}{\llet{y}{M}{N}}$
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Interpreting Call by Name}
+  We define a translation mapping $(\minus)^\circ$ from the call by name LC to the linear LC. \\
+
+  \begin{align*}
+    Z^\circ                             & \equiv Z \quad \text{,where Z is a basic type}     \\
+    (A \rightarrow B)^\circ             & \equiv (! A^\circ) \multimap B^\circ               \\
+    x^\circ                             & \equiv x                                           \\
+    (\lam{x}{M})^\circ                  & \equiv \lam{y}{\llet{x}{y}{M}}                     \\
+    (\app{M}{N})^\circ                  & \equiv \app{M^\circ}{! N^\circ}                    \\
+    (x_1 : A_1, \dots, x_n : A_n)^\circ & \equiv ! x_1 : A_1^\circ, \dots, ! x_n : A_n^\circ \\
+  \end{align*}
+
+\end{frame}
+
+\begin{frame}[fragile]{Interpreting Call by Value}
+  We define a translation mapping $(\minus)^*$ from the call by value LC to the linear LC, together with a helper function $(\minus)^+$ on values \\
+
+  \begin{align*}
+    Z^+                             & \equiv Z \quad \text{,where Z is a basic type}     \\
+    A^*                             & \equiv ! A^+                                       \\
+    (A \rightarrow B)^+             & \equiv A^* \multimap B^*                           \\
+    V^*                             & \equiv ! V^+ \quad \text{,where Z is a Value type} \\
+    x^+                             & \equiv x                                           \\
+    (\lam{x}{M})^+                  & \equiv \lam{y}{\llet{x}{y}{M^*}}                   \\
+    (\app{M}{N})^*                  & \equiv \app{(\llet{z}{M^*}{z})}{N^*}               \\
+    (x_1 : A_1, \dots, x_n : A_n)^* & \equiv ! x_1 : ! A_1^+, \dots, ! x_n : ! A_n^+     \\
+  \end{align*}
+\end{frame}
+
+
+\begin{frame}[fragile]{Call by let LC (Types, Terms)}
+  \begin{textblock*}{3cm}(0.3cm, 1cm)
+    \begin{align*}
+      \textbf{Types : } A, B , C ::= & \; \text{basic types} \;  | \; A \rightarrow B \\
+      \textbf{Terms : } L,M, N ::=   & \; V \; | \; \app{M}{N}  | \; \llet{x}{M}{N}   \\
+      \textbf{Values : } V, W ::=    & \; x \; | \; \lam{x}{t}                        \\
+    \end{align*}
+  \end{textblock*}
+
+  \begin{inference}{0.1cm}{3cm}
+    \AXC{}
+    \LeftLabel{\scriptsize Id}
+    \UIC{$x : A \vdash x : A$}
+  \end{inference}
+
+  \begin{inference}{4.2cm}{2.9cm}
+    \AXC{$\Gamma \vdash M : A$}
+    \AXC{$\Gamma, x : A \vdash N : B$}
+    \LeftLabel{\scriptsize Let}
+    \BIC{$\Gamma , \Delta \vdash \plet{x}{M}{N} : B $}
+  \end{inference}
+
+  \begin{inference}{0.8cm}{4.5cm}
+    \AXC{$\Gamma, y : A, z : A \rightarrow M : B$}
+    \LeftLabel{\scriptsize Contraction}
+    \UIC{$\Gamma , x : A \vdash M \substt{y}{x}{z}{x} : B$}
+  \end{inference}
+
+  \begin{inference}{6.8cm}{4.5cm}
+    \AXC{$\Gamma \vdash M : B$}
+    \LeftLabel{\scriptsize Weakening}
+    \UIC{$\Gamma , x : A \vdash M  : B$}
+  \end{inference}
+
+  \begin{inference}{0.1cm}{6cm}
+    \AXC{$\Gamma, x:A \vdash M : B$}
+    \LeftLabel{\scriptsize $\rightarrow - Intro$}
+    \UIC{$\Gamma \vdash \lam{x}{M} : A \rightarrow B$}
+  \end{inference}
+
+  \begin{inference}{5.5cm}{6cm}
+    \AXC{$\Gamma \vdash M : A \rightarrow B$}
+    \AXC{$\Delta \vdash N : A$}
+    \LeftLabel{\scriptsize $\rightarrow - Elim$}
+    \BIC{$\Gamma, \Delta \vdash \app{M}{N} : B$}
+  \end{inference}
+
+\end{frame}
+
+\begin{frame}[fragile]{Call by Let Reductions}
+  \begin{description}
+    \item[(I)] $\app{(\lam{x}{M})}{N} \rightsquigarrow \plet{x}{N}{M}$
+    \item[(V)] $\plet{x}{V}{N} \rightsquigarrow N \subst{x}{M} \quad \text{, where V is a value}$
+    \item[(C)] $\app{(\plet{x}{L}{M})}{N} \rightsquigarrow \plet{x}{L}{(\app{M}{N})}$
+    \item[(A)] $\plet{x}{(\plet{y}{L}{M})}{N} \rightsquigarrow \plet{x}{L}{(\plet{y}{M}{N})}$
+  \end{description}
+
+\end{frame}
+
+
+\begin{frame}[fragile]{Call by Need}
+  \begin{textblock*}{3cm}(0.3cm, 1cm)
+    \begin{align*}
+      \textbf{Types : } A, B , C ::= & \; \text{basic types} \;  | \; A \rightarrow B \\
+      \textbf{Terms : } L,M, N ::=   & \; V \; | \; \app{M}{N}  | \; \llet{x}{M}{N}   \\
+      \textbf{Values : } V, W ::=    & \; x \; | \; \lam{x}{t}                        \\
+    \end{align*}
+  \end{textblock*}
+
+  \begin{inference}{0.1cm}{3cm}
+    \AXC{}
+    \LeftLabel{\scriptsize Id}
+    \UIC{$x : A \vdash x : A$}
+  \end{inference}
+
+  \begin{inference}{4.2cm}{2.9cm}
+    \AXC{$\Gamma \vdash M : A$}
+    \AXC{$\Gamma, x : A \vdash N : B$}
+    \LeftLabel{\scriptsize Let}
+    \BIC{$\Gamma , \Delta \vdash \plet{x}{M}{N} : B $}
+  \end{inference}
+
+  \begin{inference}{0.8cm}{4.5cm}
+    \AXC{$\Gamma, y : A, z : A \rightarrow M : B$}
+    \LeftLabel{\scriptsize Contraction}
+    \UIC{$\Gamma , x : A \vdash M \substt{y}{x}{z}{x} : B$}
+  \end{inference}
+
+  \begin{inference}{6.8cm}{4.5cm}
+    \AXC{$\Gamma \vdash M : B$}
+    \LeftLabel{\scriptsize Weakening}
+    \UIC{$\Gamma , x : A \vdash M  : B$}
+  \end{inference}
+
+  \begin{inference}{0.1cm}{6cm}
+    \AXC{$\Gamma, x:A \vdash M : B$}
+    \LeftLabel{\scriptsize $\rightarrow - Intro$}
+    \UIC{$\Gamma \vdash \lam{x}{M} : A \rightarrow B$}
+  \end{inference}
+
+  \begin{inference}{5.5cm}{6cm}
+    \AXC{$\Gamma \vdash M : A \rightarrow B$}
+    \AXC{$\Delta \vdash N : A$}
+    \LeftLabel{\scriptsize $\rightarrow - Elim$}
+    \BIC{$\Gamma, \Delta \vdash \app{M}{N} : B$}
+  \end{inference}
+\end{frame}
+
+\begin{frame}[fragile]{Call by Need Reductions}
+  \begin{description}
+    \item[(I)] $\app{(\lam{x}{M})}{N} \rightsquigarrow \plet{x}{N}{M}$
+    \item[(V)] $\plet{x}{V}{N} \rightsquigarrow N \subst{x}{M} \quad \text{, where V is a value}$
+    \item[(C)] $\app{(\plet{x}{L}{M})}{N} \rightsquigarrow \plet{x}{L}{(\app{M}{N})}$
+    \item[(A)] $\plet{x}{(\plet{y}{L}{M})}{N} \rightsquigarrow \plet{x}{L}{(\plet{y}{M}{N})}$
+    \item[(G)] $\plet{x}{M}{N} \rightsquigarrow N \quad \text{if x not free in N}$
+  \end{description}
+
+\end{frame}
+
+\begin{frame}[fragile]{Affine Lambda Calculus (Syntax)}
 
   \begin{textblock*}{3cm}(0.3cm, 1cm)
     \begin{align*}
@@ -253,7 +543,6 @@
       \textbf{Terms : } L,M, N ::=   & \; x \; | \; ! M  \; | \; \llet{x}{M}{N}  \; | \; \lam{x}{M} \; | \; \app{M}{N} \\
     \end{align*}
   \end{textblock*}
-
   \begin{inference}{0.1cm}{3cm}
     \AXC{}
     \LeftLabel{\scriptsize Id}
@@ -266,25 +555,25 @@
     \UIC{$\Gamma, ! x : ! A \vdash M : B$}
   \end{inference}
 
-  \begin{inference}{4cm}{4cm}
+  \begin{inference}{0.8cm}{4.5cm}
     \AXC{$\Gamma, ! y : ! A, ! z : ! A \multimap M : B$}
     \LeftLabel{\scriptsize Contraction}
     \UIC{$\Gamma , ! x : ! A \vdash M \substt{y}{x}{z}{x} : B$}
   \end{inference}
 
-  \begin{inference}{4cm}{4cm}
+  \begin{inference}{6.8cm}{4.5cm}
     \AXC{$\Gamma \vdash M : B$}
-    \LeftLabel{\scriptsize Weakening}
+    \LeftLabel{\scriptsize $Weakening_{Aff}$}
     \UIC{$\Gamma , x : A \vdash M  : B$}
   \end{inference}
 
-  \begin{inference}{0.1cm}{4cm}
+  \begin{inference}{0.1cm}{6cm}
     \AXC{$! \Gamma \vdash M : A$}
     \LeftLabel{\scriptsize !-Intro}
     \UIC{$! \Gamma \vdash ! M : ! A$}
   \end{inference}
 
-  \begin{inference}{0.1cm}{5cm}
+  \begin{inference}{4.7cm}{6cm}
     \AXC{$! \Gamma \vdash M : ! A$}
     \AXC{$\Delta, ! x : ! A \vdash N : B$}
     \LeftLabel{\scriptsize !-Elim}
@@ -293,35 +582,71 @@
 
 \end{frame}
 
-
-
-
-
-
-
-
-\begin{frame}[fragile]{Preliminaries}
-  \begin{alertblock}{Linear Logic}
-    \begin{itemize}
-      \item a resource sensitive logic
-      \item can be used to priority in evaluation of proof terms
-    \end{itemize}
-  \end{alertblock}
-
-  \pause
-
-  \begin{alertblock}{A massive leap of faith}
-    \begin{itemize}
-      \item build a linear lambda calculus \cite[]{Maraist1995Jan}
-      \item show that it can be used to model execution strategies
-    \end{itemize}
-  \end{alertblock}
+\begin{frame}{Reduction For Affine LC}
+  \begin{itemize}
+    \item ($\beta_{\multimap}$) : $\app{(\lam{x}{M})}{N} \rightsquigarrow M \subst{x}{N}$
+    \item ($\beta_{!}$) : $\llet{x}{! M}{! N} \rightsquigarrow N \subst{x}{M}$
+    \item ($! \multimap$) : $\app{\llet{x}{L}{M}}{N}  \rightsquigarrow \llet{x}{L}{\app{M}{N}}$
+    \item ($! !$): $\llet{y}{\llet{x}{L}{M}}{N} \rightsquigarrow \llet{x}{L}{\llet{y}{M}{N}}$
+    \item ($! Weakening$) : $\llet{x}{M}{N} \rightsquigarrow N \quad \text{if x not free in N}$
+  \end{itemize}
 \end{frame}
 
+\begin{frame}[fragile]{Interpreting Call by Let}
+  We define a translation mapping $(\minus)^{*let}$ from the call by let LC to the linear LC, together with a helper function $(\minus)^{+let}$ on values \\
+  \begin{align*}
+    Z^{+let}                             & \equiv Z \quad \text{,where Z is a basic type}           \\
+    A^{*let}                             & \equiv ! A^{+let}                                        \\
+    (A \rightarrow B)^{+let}             & \equiv A^{*let} \multimap B^{*let}                       \\
+    V^{*let}                             & \equiv ! V^{+let} \quad \text{,where Z is a Value type}  \\
+    x^{+let}                             & \equiv x                                                 \\
+    (\lam{x}{M})^{+let}                  & \equiv \lam{y}{\llet{x}{y}{M^{*let}}}                    \\
+    (\app{M}{N})^{*let}                  & \equiv \app{(\llet{z}{M^{*let}}{z})}{N^{*let}}           \\
+    (\plet{x}{M}{N})^{*let}              & \equiv \llet{x}{M^{*let}}{N^{*let}}                      \\
+    (x_1 : A_1, \dots, x_n : A_n)^{*let} & \equiv ! x_1 : ! A_1^{+let}, \dots, ! x_n : ! A_n^{+let} \\
+  \end{align*}
+\end{frame}
 
+\begin{frame}[fragile]{Interpreting Call by Need}
+  We define a translation mapping $(\minus)^{*need}$ from the call by need LC to the $\textbf{affine LC}$, together with a helper function $(\minus)^{+need}$ on values \\
+  \begin{align*}
+    Z^{+need}                             & \equiv Z \quad \text{,where Z is a basic type}             \\
+    A^{*need}                             & \equiv ! A^{+need}                                         \\
+    (A \rightarrow B)^{+need}             & \equiv A^{*need} \multimap B^{*need}                       \\
+    V^{*need}                             & \equiv ! V^{+need} \quad \text{,where Z is a Value type}   \\
+    x^{+need}                             & \equiv x                                                   \\
+    (\lam{x}{M})^{+need}                  & \equiv \lam{y}{\llet{x}{y}{M^{*need}}}                     \\
+    (\app{M}{N})^{*need}                  & \equiv \app{(\llet{z}{M^{*need}}{z})}{N^{*need}}           \\
+    (\plet{x}{M}{N})^{*need}              & \equiv \llet{x}{M^{*need}}{N^{*need}}                      \\
+    (x_1 : A_1, \dots, x_n : A_n)^{*need} & \equiv ! x_1 : ! A_1^{+need}, \dots, ! x_n : ! A_n^{+need} \\
+  \end{align*}
+\end{frame}
 
+\begin{frame}[fragile]{Results}
+  \begin{enumerate}[<+->]
+    \item all the calculi introduced here are confluent and satisfy subject reduction
+    \item all the translations are sound, preserve substitution, types and reductions
+    \item Call by Let LC conservatively extends the linear lambda calculus
+    \item Call by Let LC is observationally equivalent to Call by Value LC
+    \item Call by Need LC is observationally equivalent to Call by Name LC
+  \end{enumerate}
+\end{frame}
 
+\begin{frame}{Extensions}
+  \begin{itemize}
+    \item Product Types - Yes
+    \item Sum Types - Yes (with some caveats)
+    \item Constants - Yes
+    \item Recursion - Unclear for the Linear LC
+  \end{itemize}
+\end{frame}
 
+\begin{frame}{Conclusion}
+  \begin{itemize}
+    \item Linear LC is a good model for studying evaluation strategies
+    \item Open questions remain: eta rules, equality
+  \end{itemize}
+\end{frame}
 
 
 \begin{frame}[allowframebreaks]{References}
