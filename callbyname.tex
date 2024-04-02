@@ -135,16 +135,6 @@
 
 \maketitle
 
-% plan
-% short motivation
-% introduce the lambda calculus and explain the evaluation strategies within it
-% introduce the linear lambda calculus
-% show how to interpret call by value
-% show how to interpret call by name
-% shortly talk about the affine lambda calculus
-% show how to interpret call by let
-% show how to interpret call by need
-
 
 \begin{frame}[fragile]{Motivation}
   \begin{alertblock}{Some Context}
@@ -236,7 +226,7 @@
 \begin{frame}[fragile]{Call by Name (Example)}
   \begin{exampleblock}{Call by Name}
     \begin{align*}
-      \app{(\lam{x}{x+x})}{(3+3)}       \\
+       & \app{(\lam{x}{x+x})}{(3+3)}    \\
        & \rightsquigarrow (3+3) + (3+3) \\
        & \rightsquigarrow 6 + (3+3)     \\
        & \rightsquigarrow 6 + 6         \\
@@ -249,7 +239,7 @@
 
   \begin{exampleblock}{Call by Value}
     \begin{align*}
-      \app{(\lam{x}{x+x})}{(3+3)}                       \\
+       & \app{(\lam{x}{x+x})}{(3+3)}                    \\
        & \quad \rightsquigarrow \app{(\lam{x}{x+x})}{6} \\
        & \quad \rightsquigarrow 6 + 6                   \\
        & \quad \rightsquigarrow 12
@@ -262,16 +252,19 @@
 
 \begin{frame}[fragile]{Linear Lambda Calculus (Terms, Types)}
 
-  \begin{textblock*}{5cm}(9cm, 1cm)
+  \begin{textblock*}{5cm}(9.4cm, 1cm)
     \includegraphics[width=0.7\textwidth]{girard.jpeg}
   \end{textblock*}
 
-
   \begin{textblock*}{3cm}(0.3cm, 1cm)
-    \begin{align*}
-      \textbf{Types : } A, B , C ::= & \; \text{basic types} \; | \; ! A \; | \; A \multimap B                         \\
-      \textbf{Terms : } L,M, N ::=   & \; x \; | \; ! M  \; | \; \llet{x}{M}{N}  \; | \; \lam{x}{M} \; | \; \app{M}{N} \\
-    \end{align*}
+    \begin{table}
+      \begin{tabular}{ll}
+        \toprule
+        \textbf{Types} & $A, B ::= \; \text{basic types} \; | \; ! A \; | \; A \multimap B$                         \\
+        \textbf{Terms} & $M, N ::= \; x \; | \; ! M  \; | \; \llet{x}{M}{N}  \; | \; \lam{x}{M} \; | \; \app{M}{N}$ \\
+        \bottomrule
+      \end{tabular}
+    \end{table}
   \end{textblock*}
 
   \begin{inference}{0.1cm}{3cm}
@@ -318,17 +311,19 @@
     \renewcommand{\arraystretch}{1.5} % Increase the row height by 50%
     \begin{tabular}{ll}
       \toprule
-      ($\beta_{\multimap}$) & $\app{(\lam{x}{M})}{N} \rightsquigarrow M \subst{x}{N}$                    \\
-      ($\beta_{!}$)         & $\llet{x}{! M}{! N} \rightsquigarrow N \subst{x}{M}$                       \\
-      ($! \multimap$)       & $\app{\llet{x}{L}{M}}{N}  \rightsquigarrow \llet{x}{L}{\app{M}{N}}$        \\
-      ($! !$):              & $\llet{y}{\llet{x}{L}{M}}{N} \rightsquigarrow \llet{x}{L}{\llet{y}{M}{N}}$ \\
+      ($\beta_{\multimap}$) & $\app{(\lam{x}{M})}{N} \rightsquigarrow M \subst{x}{N}$                        \\
+      ($\beta_{!}$)         & $\llet{x}{! M}{! N} \rightsquigarrow N \subst{x}{M}$                           \\
+      ($! \multimap$)       & $\app{(\llet{x}{L}{M})}{N}  \rightsquigarrow \llet{x}{L}{(\app{M}{N})}$        \\
+      ($! !$):              & $\llet{y}{(\llet{x}{L}{M})}{N} \rightsquigarrow \llet{x}{L}{(\llet{y}{M}{N})}$ \\
       \bottomrule
     \end{tabular}
   \end{table}
 \end{frame}
 
 \begin{frame}[fragile]{Interpreting Call by Name}
-  $(\minus)^\circ$ : Call by Name LC $\to$ Linear LC. \\
+  \begin{alertblock}{Translation}
+    $(\minus)^\circ$ : Call by Name LC $\to$ Linear LC. \\
+  \end{alertblock}
 
   \begin{align*}
     Z^\circ                             & \equiv Z \quad \text{,where Z is a basic type}     \\
@@ -342,7 +337,9 @@
 \end{frame}
 
 \begin{frame}[fragile]{Interpreting Call by Value}
-  $(\minus)^*$ : Call by Value LC $\to$ Linear LC\\
+  \begin{alertblock}{Translation}
+    $(\minus)^*$ : Call by Value LC $\to$ Linear LC\\
+  \end{alertblock}
 
   \begin{align*}
     Z^+                             & \equiv Z \quad \text{,where Z is a basic type}     \\
@@ -383,11 +380,15 @@
 
 \begin{frame}[fragile]{Call by let LC (Types, Terms)}
   \begin{textblock*}{3cm}(0.3cm, 1cm)
-    \begin{align*}
-      \textbf{Types : } A, B , C ::= & \; \text{basic types} \;  | \; A \rightarrow B \\
-      \textbf{Terms : } L,M, N ::=   & \; V \; | \; \app{M}{N}  | \; \plet{x}{M}{N}   \\
-      \textbf{Values : } V, W ::=    & \; x \; | \; \lam{x}{t}                        \\
-    \end{align*}
+    \begin{table}
+      \begin{tabular}{ll}
+        \toprule
+        \textbf{Types}  & $A, B ::= \; \text{basic types} \; | \; A \rightarrow B$  \\
+        \textbf{Terms}  & $M, N ::=   \; V \; | \; \app{M}{N}  | \; \plet{x}{M}{N}$ \\
+        \textbf{Values} & $V, W ::= \; x \; | \; \lam{x}{t}$                        \\
+        \bottomrule
+      \end{tabular}
+    \end{table}
   \end{textblock*}
 
   \begin{inference}{0.1cm}{3cm}
@@ -448,11 +449,15 @@
   \end{textblock*}
 
   \begin{textblock*}{3cm}(0.3cm, 1cm)
-    \begin{align*}
-      \textbf{Types : } A, B , C ::= & \; \text{basic types} \;  | \; A \rightarrow B \\
-      \textbf{Terms : } L,M, N ::=   & \; V \; | \; \app{M}{N}  | \; \plet{x}{M}{N}   \\
-      \textbf{Values : } V, W ::=    & \; x \; | \; \lam{x}{t}                        \\
-    \end{align*}
+    \begin{table}
+      \begin{tabular}{ll}
+        \toprule
+        \textbf{Types}  & $A, B ::= \; \text{basic types} \; | \; A \rightarrow B$  \\
+        \textbf{Terms}  & $M, N ::=   \; V \; | \; \app{M}{N}  | \; \plet{x}{M}{N}$ \\
+        \textbf{Values} & $V, W ::= \; x \; | \; \lam{x}{t}$                        \\
+        \bottomrule
+      \end{tabular}
+    \end{table}
   \end{textblock*}
 
   \begin{inference}{0.1cm}{3cm}
@@ -506,13 +511,18 @@
 \end{frame}
 
 \begin{frame}[fragile]{Affine Lambda Calculus (Syntax)}
-
   \begin{textblock*}{3cm}(0.3cm, 1cm)
-    \begin{align*}
-      \textbf{Types : } A, B , C ::= & \; \text{basic types} \; | \; ! A \; | \; A \multimap A                         \\
-      \textbf{Terms : } L,M, N ::=   & \; x \; | \; ! M  \; | \; \llet{x}{M}{N}  \; | \; \lam{x}{M} \; | \; \app{M}{N} \\
-    \end{align*}
+    \begin{table}
+      \begin{tabular}{ll}
+        \toprule
+        \textbf{Types} & $A, B , C ::= \; \text{basic types} \; | \; ! A \; | \; A \multimap B$                       \\
+        \textbf{Terms} & $M, N ::=   \; x \; | \; ! M  \; | \; \llet{x}{M}{N}  \; | \; \lam{x}{M} \; | \; \app{M}{N}$ \\
+        \bottomrule
+      \end{tabular}
+    \end{table}
   \end{textblock*}
+
+
   \begin{inference}{0.1cm}{3cm}
     \AXC{}
     \LeftLabel{\scriptsize Id}
@@ -563,7 +573,10 @@
 \end{frame}
 
 \begin{frame}[fragile]{Interpreting Call by Let}
-  $(\minus)^{*let}$: Call By Let LC $\to$ Linear LC\\
+  \begin{alertblock}{Translation}
+    $(\minus)^{*let}$: Call By Let LC $\to$ Linear LC\\
+  \end{alertblock}
+
   \begin{align*}
     Z^{+let}                             & \equiv Z \quad \text{,where Z is a basic type}           \\
     A^{*let}                             & \equiv ! A^{+let}                                        \\
@@ -578,7 +591,10 @@
 \end{frame}
 
 \begin{frame}[fragile]{Interpreting Call by Need}
-  $(\minus)^{*need}$: Call by Need LC $\to$ $\textbf{Affine LC}$\\
+  \begin{alertblock}{Translation}
+    $(\minus)^{*need}$: Call by Need LC $\to$ $\textbf{Affine LC}$\\
+  \end{alertblock}
+
   \begin{align*}
     Z^{+need}                             & \equiv Z \quad \text{,where Z is a basic type}             \\
     A^{*need}                             & \equiv ! A^{+need}                                         \\
@@ -608,7 +624,7 @@
     \begin{itemize}[<+->]
       \item Affine LC satisfies confluence and subject reduction
       \item Translations let us transfer these results
-      \item Call by Let LC conservatively extends the linear lambda calculus
+      \item Call by Let LC conservatively extends the Call by Value LC
       \item Call by Let LC is observationally equivalent to Call by Value LC
       \item Call by Need LC is observationally equivalent to Call by Name LC
     \end{itemize}
@@ -628,9 +644,7 @@
 
   \begin{alertblock}{Future Work}
     \begin{itemize}
-      \item Product Types
       \item Sum Types (hard)
-      \item Constants
       \item Recursion (very hard)
       \item eta rules (very hard)
       \item equality (very hard)
