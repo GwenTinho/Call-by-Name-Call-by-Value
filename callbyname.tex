@@ -329,7 +329,7 @@
     Z^\circ                             & \equiv Z \quad \text{,where Z is a basic type}     \\
     (A \rightarrow B)^\circ             & \equiv (! A^\circ) \multimap B^\circ               \\
     x^\circ                             & \equiv x                                           \\
-    (\lam{x}{M})^\circ                  & \equiv \lam{y}{\llet{x}{y}{M}}                     \\
+    (\lam{x}{M})^\circ                  & \equiv \lam{y}{\llet{x}{y}{M^\circ}}               \\
     (\app{M}{N})^\circ                  & \equiv \app{M^\circ}{! N^\circ}                    \\
     (x_1 : A_1, \dots, x_n : A_n)^\circ & \equiv ! x_1 : A_1^\circ, \dots, ! x_n : A_n^\circ \\
   \end{align*}
